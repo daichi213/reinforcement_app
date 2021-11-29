@@ -1,7 +1,6 @@
-FROM jupyter/scipy-notebook
-RUN conda update --all && conda install tensorFlow==2.4.1 lightgbm  && \
-conda install -c bioconda piper
-#  自然言語処理
-# conda install -c conda-forge -y wordcloud nltk plotly xgboost mecab copulae arch-py fastparquet
-# 強化学習の実験環境
+FROM jupyter/tensorflow-notebook
+USER root
+RUN apt-get update && apt-get install -y vim
+RUN conda update --all && conda install lightgbm  && \
+conda install -c bioconda piper && conda install -c conda-forge xgboost plotly gym
 RUN conda install -c conda-forge -y gym
