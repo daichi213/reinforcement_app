@@ -58,6 +58,7 @@ class Qnetwork:
                       loss='mse')
         return model
 
+    # 教師データが行動価値関数
     def build_trainable_graph(self, network):
         action_mask_input = Input(
             shape=(self.action_len,), name='a_mask_inp')
@@ -100,6 +101,7 @@ class Qnetwork:
         next_state = np.array(next_state)
         done = np.array(done)
 
+        # 次状態のactions_listすべての行動価値関数を計算
         next_target_q_values_batch = \
             self.target_network.predict_on_batch(next_state)
         next_q_values_batch = \
@@ -109,6 +111,7 @@ class Qnetwork:
         # 次状態の行動価値観数の計算
         if self.double_mode:
             future_return = [
+                # TODO ?
                 next_target_q_values[np.argmax(
                     next_q_values)]
                 for next_target_q_values, next_q_values
@@ -121,9 +124,10 @@ class Qnetwork:
                 in next_target_q_values_batch
             ]
         # 現時点での行動価値観数の計算
+        # (1 - done)はstepの終端で行動価値関数を0とするような計算式になっている
         y = reward + self.gamma * \
             (1 - done) * future_return
-        # 核状態と行動変数が訓練データで上で計算した行動価値観数が教師データ
+        # 各状態と行動変数が訓練データで上で計算した行動価値観数が教師データ
         loss, td_error = \
             self.trainable_network.train_on_batch(
              [state, action_mask], np.expand_dims(y, -1))

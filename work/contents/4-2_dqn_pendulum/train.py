@@ -52,7 +52,7 @@ def train():
     # インスタンス作成 ==================
     os.makedirs(result_dir, exist_ok=True)
     print(result_dir)
-    env = gym.make('Pendulum-v0')
+    env = gym.make('Pendulum-v1')
     dim_state = env.env.observation_space.shape[0]
     q_network = Qnetwork(dim_state,
                          actions_list,
