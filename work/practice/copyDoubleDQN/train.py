@@ -1,6 +1,7 @@
 import gym
 import numpy as np
 import random
+from model import Qmodel
 
 def train():
     env = gym.make('Pendulum-v1')
@@ -13,6 +14,7 @@ def train():
     alpha = 0.1
     gamma = 0.1
     epsilon = 0.1
+    q_network = Qmodel()
     # warm up(行動自体は方策を使用せずにランダムに選択してメモリに行動系列を蓄積する)
     while True:
         action = random.choice(actions_list)
