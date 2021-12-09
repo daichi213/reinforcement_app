@@ -49,6 +49,11 @@ class Qmodel:
 
     def update_values(self, double_mode, exps):
         (state, reward, action, done, next_state) = zip(*exps)
+        state = np.array(state)
+        reward = np.array(reward)
+        action = np.array(action)
+        done = np.array(done)
+        next = np.array(next)
         if double_mode:
             future_return = np.array([target_q[np.argmax(main_q)] 
                 for main_q, target_q 
@@ -59,3 +64,4 @@ class Qmodel:
         else:
             future_return = np.array([self.main_network.predict_on_batch(np.array(state))])
         y = reward + self.gamma * (1 - done) * future_return
+        build_network = self.build_trainable_graph()
