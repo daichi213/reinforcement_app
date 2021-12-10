@@ -33,8 +33,8 @@ class Qmodel:
 
     def build_trainable_graph(self, action):
         # 最適行動価値関数以外を0とした教師データを生成する
-        action_mask = [1 if a==action else 0 for a in self.actions_list]
-        best_q = Dot(axes=-1)(self.main_network, np.array(action_mask))
+        action_mask = Input(shape=(self.actions_len,), name="a_mask_input")
+        best_q = Dot(axes=-1)(self.main_network, action_mask, name="a_best_q")
         build_network = Model(inputs=[self.main_network,action_mask], outputs=[best_q])
         build_network.compile(optimizer=self.optimizer,
                                 loss='mse', 
@@ -65,3 +65,4 @@ class Qmodel:
             future_return = np.array([self.main_network.predict_on_batch(np.array(state))])
         y = reward + self.gamma * (1 - done) * future_return
         build_network = self.build_trainable_graph()
+        action_mask = [1 if a==action else 0 for a in self.actions_list]
