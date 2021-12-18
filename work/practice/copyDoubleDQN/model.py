@@ -31,10 +31,11 @@ class Qmodel:
         model.compile(loss='mse', optimizer=self.optimizer)
         return model
 
-    def build_trainable_graph(self, action):
+    def build_trainable_graph(self, network):
         # 最適行動価値関数以外を0とした教師データを生成する
         action_mask = Input(shape=(self.actions_len,), name="a_mask_input")
-        best_q = Dot(axes=-1)(self.main_network, action_mask, name="a_best_q")
+        q_values = network.output
+        best_q = Dot(axes=-1)(q_values, action_mask, name="a_best_q")
         build_network = Model(inputs=[self.main_network,action_mask], outputs=[best_q])
         build_network.compile(optimizer=self.optimizer,
                                 loss='mse', 
@@ -47,7 +48,7 @@ class Qmodel:
         set_weights_for_target = np.array([target_network_weights[idx] * (1 - coef) + w * coef] for idx,w in enumerate(main_network_weights))
         self.main_network.set_weights(set_weights_for_target)
 
-    def update_values(self, double_mode, exps):
+    def update_values(self, double_mode=True, exps):
         (state, reward, action, done, next_state) = zip(*exps)
         state = np.array(state)
         reward = np.array(reward)
@@ -64,5 +65,9 @@ class Qmodel:
         else:
             future_return = np.array([self.main_network.predict_on_batch(np.array(state))])
         y = reward + self.gamma * (1 - done) * future_return
-        build_network = self.build_trainable_graph()
+        build_network = self.build_trainable_graph(self.main_network)
         action_mask = [1 if a==action else 0 for a in self.actions_list]
+        loss, td_error = build_network.train_on_batch(
+            [state, action_mask], np.expand_dims(y, -1)
+        )
+        return loss, td_error

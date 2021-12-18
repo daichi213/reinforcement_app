@@ -1,5 +1,25 @@
 # DDQN実装メモ
 
+## Python標準
+
+### with open
+
+```python
+import csv
+import os
+
+cur_dir = os.getcwd()
+csv_path = os.path.join(cur_dir, "test.csv")
+# ファイルを新規で開き保存する
+with open(csv_path, 'w') as f:
+        writer = csv.writer(f)
+        writer.writerow(self.header)
+# ファイルに対して追記する
+with open(csv_path, 'a') as f:
+        writer = csv.writer(f)
+        writer.writerow(self.header)
+```
+
 ## Tensorflow
 
 ### tensorflow.keras.layers.Dot
