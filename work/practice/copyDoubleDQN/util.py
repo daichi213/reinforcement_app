@@ -1,9 +1,16 @@
 import csv
+import os
 
 class RecordHistory:
     def __init__(self, csv_path, header):
         self.csv_path = csv_path
         self.header = header
+    
+    def make_directory(self, directory):
+        current_dir = os.getcwd()
+        directory = os.path.join(current_dir, directory)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
     
     def generate_csv(self):
         with open(self.csv_path, 'w') as f:
