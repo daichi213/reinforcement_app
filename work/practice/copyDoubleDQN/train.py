@@ -4,7 +4,8 @@ import random
 from model import Qmodel
 from policy import EpsilonGreedyPolicy
 from datetime import datetime
-from utils import RecordHistory
+from util import RecordHistory
+import os
 
 def train():
     env = gym.make('Pendulum-v1')
@@ -27,8 +28,16 @@ def train():
     epsilon = 0.1
     state_num = env.env.observation_space.shape[0]
     # Record用のディレクトリ作成とその他準備
+    header = [
+        "num_episode", "loss", "td_error", "reward_avg"
+    ]
     csv_name = datetime.now().strftime('%Y%m%d%H%M')
-    record = RecordHistory(csv_name)
+    csv_name = csv_name + ".csv"
+    record = RecordHistory(csv_name, header)
+    result_dir_name = "./result"
+    result_dir = record.make_directory(result_dir_name)
+    csv_path = os.path.join(result_dir, csv_name)
+    record.generate_csv()
 
     q_network = Qmodel(gamma, state_num, actions_list)
     greedy_policy = EpsilonGreedyPolicy(q_network.main_network, epsilon)
@@ -90,4 +99,20 @@ def train():
                 td_error_avg = np.mean(td_list)
                 print("{:,}th step done reward_avg:{} loss_avg:{} td_avg:{}".format(num_episode, reward_avg, loss_avg, td_error))
                 if num_episode % interval == 0:
-                    model_path = os.path.join()
+                    model_path = os.path.join(
+                        result_dir,
+                        'episode_{}.h5'.format(num_episode)
+                    )
+                    q_network.main_network.save(model_path)
+                    history = {
+                        "num_episode" : num_episode,
+                        "loss" : loss_avg,
+                        "td_error" : td_error_avg,
+                        "reward_avg" : reward_avg
+                    }
+                    record.add_histry(history)
+        if num_episode >= max_episode:
+            episode_loop = False
+
+        env.close()
+        print('trianing {:,} episodes... done.'.format(max_episode))

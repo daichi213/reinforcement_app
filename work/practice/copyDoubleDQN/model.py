@@ -48,13 +48,13 @@ class Qmodel:
         set_weights_for_target = np.array([target_network_weights[idx] * (1 - coef) + w * coef] for idx,w in enumerate(main_network_weights))
         self.main_network.set_weights(set_weights_for_target)
 
-    def update_values(self, double_mode=True, exps):
+    def update_values(self, exps, double_mode=True):
         (state, reward, action, done, next_state) = zip(*exps)
         state = np.array(state)
         reward = np.array(reward)
         action = np.array(action)
         done = np.array(done)
-        next = np.array(next)
+        next_state = np.array(next_state)
         if double_mode:
             future_return = np.array([target_q[np.argmax(main_q)] 
                 for main_q, target_q 
