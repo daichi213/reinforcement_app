@@ -4,7 +4,7 @@ import random
 from model import Qmodel
 from policy import EpsilonGreedyPolicy
 from datetime import datetime
-from util import RecordHistory
+from util import RecordHistory,make_directory
 import os
 
 def train():
@@ -31,16 +31,17 @@ def train():
     header = [
         "num_episode", "loss", "td_error", "reward_avg"
     ]
+    directory = make_directory("result")
     csv_name = datetime.now().strftime('%Y%m%d%H%M')
     csv_name = csv_name + ".csv"
-    record = RecordHistory(csv_name, header)
-    result_dir_name = "./result"
-    result_dir = record.make_directory(result_dir_name)
-    csv_path = os.path.join(result_dir, csv_name)
+    record = RecordHistory(
+        os.path.join(directory, csv_name), header
+    )
     record.generate_csv()
 
-    q_network = Qmodel(gamma, state_num, actions_list)
-    greedy_policy = EpsilonGreedyPolicy(q_network.main_network, epsilon)
+    dim_state = env.env.observation_space.shape[0]
+    q_network = Qmodel(gamma, state_num, actions_list, dim_state)
+    greedy_policy = EpsilonGreedyPolicy(q_network, epsilon)
     # warm up(行動自体は方策を使用せずにランダムに選択してメモリに行動系列を蓄積する)
     while True:
         action = random.choice(actions_list)
@@ -60,7 +61,7 @@ def train():
         if total_step > warmup_steps:
             break
         memory = memory[-memory_size:]
-        print("warming up {:,} steps done".format(warmup_steps))
+        print("warming up {:,} steps done".format(total_step))
     
     num_episode = 0
     episode_loop = True
@@ -72,7 +73,7 @@ def train():
         num_episode+=1
         while step_loop:
             # 行動の選択(epsilon-greedy)
-            action, epsilon, q_values = q_network.get_action(state, actions_list)
+            action, epsilon, q_values = greedy_policy.get_action(state, actions_list)
             # Q(s,a)←Q(s,a)+α(r+γmaxa′Q(s′,a′)−Q(s,a))
             next_state, reward, done, info = env.step([action])
 
@@ -116,3 +117,6 @@ def train():
 
         env.close()
         print('trianing {:,} episodes... done.'.format(max_episode))
+
+if __name__=='__main__':
+    train()

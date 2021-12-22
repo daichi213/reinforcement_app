@@ -7,11 +7,12 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Input, Dense
 
 class Qmodel:
-    def __init__(self, gamma, state_num, actions_list):
+    def __init__(self, gamma, state_num, actions_list, dim_state):
         self.state_num = state_num
         self.gamma = gamma
         self.actions_list = actions_list
         self.actions_len = len(actions_list)
+        self.dim_state = dim_state
         self.optimizer = Adagrad(learning_rate=0.001)
         self.main_network = self.build_graph()
         self.target_network = self.build_graph()
