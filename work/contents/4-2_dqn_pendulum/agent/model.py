@@ -63,12 +63,14 @@ class Qnetwork:
         return model
 
     # 教師データが行動価値関数
+    # ある状態における各行動変数の行動価値関数を出力する
     # Input ->[全状態変数(len(dim_state))), 行動変数(len(actions_list))]
     # Output->[最適な行動価値関数以外が0(len(actions_list))]
     def build_trainable_graph(self, network):
         action_mask_input = Input(
             shape=(self.action_len,), name='a_mask_inp')
         q_values = network.output
+        # q_values(<keras.engine.functional.Functional at 0x7f4800067f90>)へ直接maskをかけるのは難しいため、ここでDotを使用している
         q_values_taken_action = Dot(
             axes=-1,
             name='qs_a')([q_values, action_mask_input])

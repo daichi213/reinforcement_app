@@ -113,6 +113,97 @@ array([[ 11],
 6, 7    6*16+   7*17
 8, 9    8*18+   9*19
 
+### model.summary
+
+グラフに含まれるレイヤーのサイズなどを確認するのに便利
+
+```python
+  def build_model(self):
+    n_input = self.num_state
+    n_output = self.num_action
+    n_hidden1 = 10 * n_input
+    n_hidden2 = int(np.sqrt(10 * n_input * 10 * n_output))
+    n_hidden3 = int(np.sqrt(10 * n_input * 10 * n_output))
+    n_hidden4 = 10 * n_output
+    # from IPython.core.debugger import Pdb; Pdb().set_trace()
+    input = Input(shape=(n_input,), batch_size=self.batch_size, name="build_model_input")
+    hidden1 = Dense(n_hidden1, activation="relu", name="model_hidden1")(input)
+    hidden2 = Dense(n_hidden2, activation="relu", name="model_hidden2")(hidden1)
+    hidden3 = Dense(n_hidden3, activation="relu", name="model_hidden3")(hidden2)
+    hidden4 = Dense(n_hidden4, activation="relu", name="model_hidden4")(hidden3)
+    output = Dense(n_output, activation="linear", name="model_output")(hidden4)
+    model = Model(inputs=[input], outputs=[output])
+    model.compile(self.optimizer, loss="mse")
+    model.summary()
+    return model
+```
+
+```python
+Model: "model_10"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ build_model_input (InputLay  [(10, 3)]                0         
+ er)                                                             
+                                                                 
+ model_hidden1 (Dense)       (10, 30)                  120       
+                                                                 
+ model_hidden2 (Dense)       (10, 38)                  1178      
+                                                                 
+ model_hidden3 (Dense)       (10, 38)                  1482      
+                                                                 
+ model_hidden4 (Dense)       (10, 50)                  1950      
+                                                                 
+ model_output (Dense)        (10, 5)                   255       
+                                                                 
+=================================================================
+Total params: 4,985
+Trainable params: 4,985
+Non-trainable params: 0
+_________________________________________________________________
+Model: "model_11"
+_________________________________________________________________
+ Layer (type)                Output Shape              Param #   
+=================================================================
+ build_model_input (InputLay  [(10, 3)]                0         
+ er)                                                             
+                                                                 
+ model_hidden1 (Dense)       (10, 30)                  120       
+                                                                 
+ model_hidden2 (Dense)       (10, 38)                  1178      
+                                                                 
+ model_hidden3 (Dense)       (10, 38)                  1482      
+                                                                 
+ model_hidden4 (Dense)       (10, 50)                  1950      
+                                                                 
+ model_output (Dense)        (10, 5)                   255       
+                                                                 
+=================================================================
+Total params: 4,985
+Trainable params: 4,985
+Non-trainable params: 0
+_________________________________________________________________
+Model: "model_12"
+__________________________________________________________________________________________________
+ Layer (type)                   Output Shape         Param #     Connected to                     
+==================================================================================================
+ input_6 (InputLayer)           [(10, 5)]            0           []                               
+                                                                                                  
+ trainable_model_input (InputLa  [(None, 5)]         0           []                               
+ yer)                                                                                             
+                                                                                                  
+ trainable_model_dot (Dot)      (10, 1)              0           ['input_6[0][0]',                
+                                                                  'trainable_model_input[0][0]']  
+                                                                                                  
+==================================================================================================
+Total params: 0
+Trainable params: 0
+Non-trainable params: 0
+__________________________________________________________________________________________________
+```
+
+## numpy
+
 ### numpy.expand_dims
 
 ```python
