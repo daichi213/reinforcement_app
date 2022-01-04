@@ -14,6 +14,7 @@ class EpsilonGreedyPolicy:
             q_values = None
             action = np.random.choice(actions_list)
         else:
+            # (state_dim)→(1, state_dim)としなければpredict_on_batchでエラーとなる
             state = np.reshape(state, (1, len(state)))
             q_values = self.q_network.main_network.predict_on_batch(
                 state)[0]

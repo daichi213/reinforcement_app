@@ -113,6 +113,28 @@ array([[ 11],
 6, 7    6*16+   7*17
 8, 9    8*18+   9*19
 
+### Modelへの複数InputLayer
+
+```python
+from tensorflow.keras.models import Model
+# Model1
+input = Input(shape=(n_input,), name="build_model_input")
+hidden1 = Dense(n_hidden1, activation="relu", name="model_hidden1")(input)
+hidden2 = Dense(n_hidden2, activation="relu", name="model_hidden2")(hidden1)
+hidden3 = Dense(n_hidden3, activation="relu", name="model_hidden3")(hidden2)
+hidden4 = Dense(n_hidden4, activation="relu", name="model_hidden4")(hidden3)
+output = Dense(n_output, activation="linear", name="model_output")(hidden4)
+model = Model(inputs=[input], outputs=[output])
+
+# Model2
+masked_action = Input(shape=(self.num_action,), name="trainable_model_input")
+q_values = self.main_network.output
+q_values_mask = Dot(axes=-1, name="trainable_model_dot")([q_values, masked_action])
+trainable_model = Model(inputs=[model.input, masked_action], outputs=[q_values_mask])
+```
+
+Model1のinputをModel2にも入力とするパターンで、Modelメソッドにinputs引数にリスト形式で指定することで、実装することができる。
+
 ### model.summary
 
 グラフに含まれるレイヤーのサイズなどを確認するのに便利
