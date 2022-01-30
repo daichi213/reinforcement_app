@@ -168,6 +168,7 @@ class DataForDiscriminator(Sequence):
     def __len__(self):
         return self.n_data // self.batch_size
 
+    # Discriminatorのためのデータセットの生成
     def __getitem__(self, idx):
         batch_x = []
         batch_y = []

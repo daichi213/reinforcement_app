@@ -88,6 +88,7 @@ agent = Agent(sess, vocab_size, emb_size, g_hidden, T,
               g_lr)
 
 
+# Discriminatorを予め訓練させておくための関数
 def pre_train():
     g_data = DataForGenerator(
         id_input_data,
